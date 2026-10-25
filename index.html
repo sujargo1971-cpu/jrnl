@@ -1,0 +1,736 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jurnal Mengajar</title>
+<style>
+:root{--pri:#0f766e;--pri-d:#115e59;--pri-l:#ccfbf1;--bg:#f1f5f9;--card:#fff;--tx:#0f172a;--mut:#64748b;--bd:#e2e8f0;--err:#dc2626;--ok:#16a34a;--warn:#d97706}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--tx);font-size:15px;line-height:1.45}
+h2{margin:0 0 14px;font-size:19px}h3{margin:0 0 12px}
+label{display:block;font-weight:600;font-size:13px;margin:12px 0 5px;color:#334155}
+input,select,textarea{width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:9px;font:inherit;background:#fff;color:var(--tx)}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--pri-l);border-color:var(--pri)}
+input[readonly],.ro{background:#f8fafc;color:#334155}
+.ro{padding:10px 12px;border:1px solid var(--bd);border-radius:9px;min-height:42px}
+textarea{min-height:84px;resize:vertical}
+input[type=checkbox]{width:auto}
+.btn{border:1px solid #cbd5e1;background:#fff;color:var(--tx);padding:9px 15px;border-radius:9px;font:inherit;font-weight:600;cursor:pointer}
+.btn:hover{background:#f1f5f9}
+.btn.primary{background:var(--pri);border-color:var(--pri);color:#fff}.btn.primary:hover{background:var(--pri-d)}
+.btn.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+.btn.warn{background:var(--warn);border-color:var(--warn);color:#fff}
+.btn.danger{color:var(--err);border-color:#fecaca}
+.btn.sm{padding:5px 10px;font-size:13px}.btn.block{width:100%;margin-top:16px;padding:12px}
+.muted{color:var(--mut);font-size:13px}
+main{max-width:1180px;margin:0 auto;padding:16px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:18px;margin-bottom:16px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:0 16px}
+.span2{grid-column:1/-1}
+@media(max-width:720px){.grid2,.grid3{grid-template-columns:1fr}}
+/* topbar */
+#topbar{background:var(--pri);color:#fff;padding:10px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;position:sticky;top:0;z-index:20}
+#topbar img{width:40px;height:40px;object-fit:contain;background:#fff;border-radius:8px;padding:2px}
+#topbar .t1{font-weight:800;letter-spacing:.5px}#topbar .t2{font-size:12px;opacity:.9}
+#topbar .sp{flex:1}#topbar .u{font-size:13px;text-align:right}
+#topbar .btn{background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.35);color:#fff;padding:6px 11px;font-size:13px}
+.badge{display:inline-block;padding:2px 9px;border-radius:99px;font-size:12px;font-weight:700}
+.s-wait{background:#fef3c7;color:#92400e}.s-ok{background:#dcfce7;color:#166534}.s-rev{background:#fee2e2;color:#991b1b}
+/* login */
+.login-card{max-width:420px;margin:6vh auto;background:#fff;border:1px solid var(--bd);border-radius:18px;padding:26px;box-shadow:0 10px 30px rgba(15,23,42,.08)}
+.brand{text-align:center;margin-bottom:16px}.brand img{width:84px;height:84px;object-fit:contain;margin-bottom:6px}
+.app-title{font-size:24px;font-weight:800;color:var(--pri);letter-spacing:1px}
+.role-tabs{display:flex;background:#f1f5f9;border-radius:10px;padding:4px;gap:4px}
+.role-tabs button{flex:1;border:0;background:transparent;padding:9px 4px;border-radius:8px;font:inherit;font-weight:600;color:var(--mut);cursor:pointer}
+.role-tabs button.active{background:#fff;color:var(--pri);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.pw{position:relative}.pw button{position:absolute;right:6px;top:5px;border:0;background:none;font-size:18px;cursor:pointer}
+details{margin-top:18px;font-size:13px}summary{cursor:pointer;color:var(--mut)}
+/* tabs */
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.tabs button{border:1px solid var(--bd);background:#fff;padding:9px 15px;border-radius:10px;font:inherit;font-weight:600;cursor:pointer;color:#334155}
+.tabs button.active{background:var(--pri);color:#fff;border-color:var(--pri)}
+/* tables */
+.tablewrap{overflow-x:auto;border:1px solid var(--bd);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{padding:9px 11px;border-bottom:1px solid var(--bd);text-align:left;vertical-align:top}
+th{background:#f8fafc;font-size:12px;text-transform:uppercase;letter-spacing:.4px;color:var(--mut);white-space:nowrap}
+tr:last-child td{border-bottom:0}
+td.act{white-space:nowrap}td.act .btn{margin-right:4px}
+.empty{padding:26px;text-align:center;color:var(--mut)}
+.filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;align-items:end;margin-bottom:12px}
+.filters label{margin:0 0 4px}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+.stat{flex:1;min-width:110px;background:#f8fafc;border:1px solid var(--bd);border-radius:10px;padding:10px 12px}
+.stat b{font-size:22px;display:block}
+.idgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:0 14px;margin-bottom:6px}
+.logo-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.logo-row img{width:72px;height:72px;object-fit:contain;border:1px dashed #cbd5e1;border-radius:8px;padding:3px;background:#fff}
+.paraf{border:2px dashed #cbd5e1;border-radius:10px;height:70px;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:13px}
+.note{background:#fef9c3;border:1px solid #fde68a;border-radius:10px;padding:10px 12px;font-size:13px;margin:10px 0}
+.note.rev{background:#fee2e2;border-color:#fecaca}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.row.end{justify-content:flex-end}
+.dl{display:grid;grid-template-columns:150px 1fr;gap:8px 12px;font-size:14px}
+.dl dt{font-weight:700;color:#475569}.dl dd{margin:0;white-space:pre-wrap}
+@media(max-width:600px){.dl{grid-template-columns:1fr}.dl dt{margin-top:6px}}
+/* modal / toast / loader */
+#modalWrap{position:fixed;inset:0;background:rgba(15,23,42,.5);display:flex;align-items:flex-start;justify-content:center;padding:4vh 12px;overflow:auto;z-index:50}
+.modal{background:#fff;border-radius:16px;padding:22px;width:100%;max-width:640px;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+.modal.wide{max-width:780px}
+#toast{position:fixed;right:14px;bottom:14px;z-index:90;display:flex;flex-direction:column;gap:8px}
+.t{background:#0f172a;color:#fff;padding:11px 16px;border-radius:10px;font-size:14px;max-width:330px;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+.t.err{background:var(--err)}.t.ok{background:var(--ok)}
+#loader{position:fixed;inset:0;background:rgba(255,255,255,.55);display:flex;align-items:center;justify-content:center;z-index:99}
+#loader i{width:44px;height:44px;border:5px solid var(--pri-l);border-top-color:var(--pri);border-radius:50%;animation:sp .8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+/* print */
+#printArea{display:none}
+.pp{font-family:"Times New Roman",serif;color:#000;font-size:12pt;page-break-after:always}
+.pp:last-child{page-break-after:auto}
+.pp .kop{display:flex;align-items:center;gap:14px;border-bottom:3px double #000;padding-bottom:8px;margin-bottom:10px}
+.pp .kop img{width:70px;height:70px;object-fit:contain}
+.pp .k1{font-size:16pt;font-weight:bold;text-transform:uppercase}.pp .k2{font-size:10.5pt}
+.pp h2{text-align:center;font-size:14pt;margin:8px 0 10px;text-decoration:underline}
+.pp table.pt{width:100%;border-collapse:collapse;font-size:11pt}
+.pp table.pt td{border:1px solid #000;padding:5px 8px;vertical-align:top}
+.pp table.pt td:first-child{width:30%;font-weight:bold}
+.pp .sign{display:flex;justify-content:space-between;margin-top:22px;font-size:11pt;text-align:center}
+.pp .sign>div{width:46%}
+.pp .sp{height:64px}
+@media print{
+  @page{size:A4;margin:14mm}
+  body{background:#fff}
+  #app,#modalWrap,#toast,#loader{display:none!important}
+  #printArea{display:block}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <header id="topbar" hidden>
+    <img id="tbLogo" alt="" hidden>
+    <div><div class="t1">JURNAL MENGAJAR</div><div class="t2" id="tbSchool"></div></div>
+    <div class="sp"></div>
+    <div class="u"><div id="tbUser"></div><div id="tbRole" class="t2"></div></div>
+    <button class="btn" data-act="pw">🔑 Password</button>
+    <button class="btn" data-act="logout">Keluar</button>
+  </header>
+  <main>
+    <section id="viewLogin" class="view">
+      <div class="login-card">
+        <div class="brand">
+          <img id="loginLogo" alt="" hidden>
+          <div class="app-title">JURNAL MENGAJAR</div>
+          <div id="loginSchool" class="muted">Silakan masuk</div>
+        </div>
+        <div class="role-tabs" id="roleTabs">
+          <button type="button" data-role="guru" class="active">Guru</button>
+          <button type="button" data-role="admin">Admin</button>
+          <button type="button" data-role="kepsek">Kepala Sekolah</button>
+        </div>
+        <form id="loginForm" autocomplete="on">
+          <label for="lUser">Username</label>
+          <input id="lUser" autocomplete="username" required>
+          <label for="lPass">Password</label>
+          <div class="pw"><input id="lPass" type="password" autocomplete="current-password" required><button type="button" id="pwToggle" aria-label="Tampilkan password">👁</button></div>
+          <button class="btn primary block" type="submit">Masuk</button>
+        </form>
+        <details id="connBox">
+          <summary>⚙ Pengaturan koneksi</summary>
+          <label for="apiInput">URL Web App Google Apps Script</label>
+          <input id="apiInput" placeholder="https://script.google.com/macros/s/.../exec">
+          <button class="btn sm" id="apiSave" type="button" style="margin-top:8px">Simpan &amp; uji koneksi</button>
+        </details>
+      </div>
+    </section>
+    <section id="viewGuru" class="view" hidden></section>
+    <section id="viewAdmin" class="view" hidden></section>
+    <section id="viewKepsek" class="view" hidden></section>
+  </main>
+</div>
+<div id="modalWrap" hidden><div class="modal" id="modal"></div></div>
+<div id="toast"></div>
+<div id="loader" hidden><i></i></div>
+<div id="printArea"></div>
+
+<script>
+/* ============================================================
+   JURNAL MENGAJAR
+   Tempel URL Web App (Apps Script) di bawah ini, atau biarkan kosong
+   lalu isi lewat "Pengaturan koneksi" di halaman login.
+   ============================================================ */
+const DEFAULT_API = '';
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad = n => String(n).padStart(2, '0');
+const HARI = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+const BULAN = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+const TUGAS = ['Guru Kelas','Guru Mapel','Guru Kelas Fase A','Guru Kelas Fase B','Guru Kelas Fase C'];
+const FASE_RANGE = {'Guru Kelas Fase A':[1,2],'Guru Kelas Fase B':[3,4],'Guru Kelas Fase C':[5,6]};
+const ROLE_LABEL = {guru:'Guru', admin:'Administrator', kepsek:'Kepala Sekolah'};
+const KELAS_DEFAULT = {SD:'1,2,3,4,5,6', SMP:'7,8,9', SMA:'10,11,12'};
+
+const todayISO = () => { const d = new Date(); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; };
+const monthStartISO = () => { const d = new Date(); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-01`; };
+const parseISO = s => { const [y,m,d] = String(s).split('-').map(Number); return new Date(y, m-1, d); };
+const hariOf = s => s ? HARI[parseISO(s).getDay()] : '';
+const tglIndo = s => { if (!s) return ''; const d = parseISO(s); return `${d.getDate()} ${BULAN[d.getMonth()]} ${d.getFullYear()}`; };
+const leadNum = k => { const m = String(k).match(/\d+/); return m ? +m[0] : null; };
+
+const S = { token:null, user:null, boot:null, guru:[], jurnal:[], editId:null, loading:0, logoTmp:null };
+let loginRole = 'guru';
+let adminTab = 'sekolah';
+let gTab = 'form';
+
+function apiUrl(){ return DEFAULT_API || localStorage.getItem('jm_api') || ''; }
+function toast(msg, type){ const d = document.createElement('div'); d.className = 't ' + (type||''); d.textContent = msg; $('#toast').appendChild(d); setTimeout(() => d.remove(), 3800); }
+function loading(on){ S.loading += on ? 1 : -1; if (S.loading < 0) S.loading = 0; $('#loader').hidden = S.loading === 0; }
+
+async function api(action, data){
+  const url = apiUrl();
+  if (!url) throw new Error('URL Web App belum diatur. Buka "Pengaturan koneksi" di halaman login.');
+  loading(true);
+  try {
+    let res;
+    try { res = await fetch(url, { method:'POST', body: JSON.stringify(Object.assign({ action, token:S.token }, data || {})) }); }
+    catch (e) { throw new Error('Tidak dapat terhubung ke server. Periksa internet dan URL Web App.'); }
+    let j;
+    try { j = await res.json(); } catch (e) { throw new Error('Respons server tidak valid. Pastikan Web App di-deploy dengan akses "Anyone".'); }
+    if (!j.ok) { if (j.expired) doLogout(true); throw new Error(j.error || 'Terjadi kesalahan'); }
+    return j;
+  } finally { loading(false); }
+}
+async function safe(fn){ try { return await fn(); } catch (e) { toast(e.message, 'err'); } }
+
+/* ---------- modal ---------- */
+function openModal(html, wide){ const m = $('#modal'); m.className = 'modal' + (wide ? ' wide' : ''); m.innerHTML = html; $('#modalWrap').hidden = false; }
+function closeModal(){ $('#modalWrap').hidden = true; $('#modal').innerHTML = ''; }
+$('#modalWrap').addEventListener('mousedown', e => { if (e.target.id === 'modalWrap') closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+/* ---------- views ---------- */
+function showView(name){
+  ['Login','Guru','Admin','Kepsek'].forEach(n => $('#view'+n).hidden = (n.toLowerCase() !== name));
+  $('#topbar').hidden = (name === 'login');
+}
+function applyBrand(){
+  const s = S.boot.sekolah;
+  $('#tbSchool').textContent = s.nama_sekolah + (s.tahun_ajaran ? ` • TA ${s.tahun_ajaran} ${s.semester}` : '');
+  const l = $('#tbLogo'); if (s.logo) { l.src = s.logo; l.hidden = false; } else l.hidden = true;
+  $('#tbUser').textContent = S.user.nama;
+  $('#tbRole').textContent = ROLE_LABEL[S.user.role];
+  document.title = 'Jurnal Mengajar - ' + s.nama_sekolah;
+}
+
+/* ---------- login ---------- */
+async function showLogin(){
+  showView('login');
+  $('#connBox').hidden = !!DEFAULT_API;
+  $('#apiInput').value = localStorage.getItem('jm_api') || '';
+  if (!apiUrl()) { $('#connBox').open = true; return; }
+  try {
+    const r = await fetch(apiUrl(), { method:'POST', body: JSON.stringify({ action:'info' }) });
+    const j = await r.json();
+    if (j.ok) {
+      $('#loginSchool').textContent = j.info.nama_sekolah + (j.info.tahun_ajaran ? ` • TA ${j.info.tahun_ajaran} ${j.info.semester}` : '');
+      const l = $('#loginLogo'); if (j.info.logo) { l.src = j.info.logo; l.hidden = false; } else l.hidden = true;
+    }
+  } catch (e) { $('#loginSchool').textContent = 'Server belum dapat dihubungi'; }
+}
+function bindLogin(){
+  $('#roleTabs').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    loginRole = b.dataset.role;
+    [...$('#roleTabs').children].forEach(x => x.classList.toggle('active', x === b));
+  });
+  $('#pwToggle').onclick = () => { const p = $('#lPass'); p.type = p.type === 'password' ? 'text' : 'password'; };
+  $('#apiSave').onclick = async () => {
+    const v = $('#apiInput').value.trim();
+    if (!/^https:\/\/script\.google\.com\/.+\/exec$/.test(v)) { toast('URL tidak valid. Harus diakhiri /exec', 'err'); return; }
+    localStorage.setItem('jm_api', v);
+    await safe(async () => { await api('info'); toast('Koneksi berhasil', 'ok'); showLogin(); });
+  };
+  $('#loginForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    await safe(async () => {
+      const r = await api('login', { role: loginRole, username: $('#lUser').value, password: $('#lPass').value });
+      S.token = r.token; S.user = r.user;
+      sessionStorage.setItem('jm_sess', JSON.stringify({ token:r.token, user:r.user }));
+      $('#lPass').value = '';
+      await enter();
+    });
+  });
+}
+async function enter(){
+  const r = await api('boot');
+  S.boot = r;
+  applyBrand();
+  if (S.user.role === 'guru') { showView('guru'); renderGuru(); }
+  else if (S.user.role === 'admin') { showView('admin'); renderAdmin(); }
+  else { showView('kepsek'); renderKepsek(); }
+}
+function doLogout(silent){
+  S.token = null; S.user = null; S.boot = null; S.editId = null;
+  sessionStorage.removeItem('jm_sess');
+  closeModal();
+  if (!silent) toast('Anda telah keluar');
+  showLogin();
+}
+
+/* ---------- ganti password ---------- */
+function pwModal(){
+  openModal(`<h3>Ganti Password</h3>
+  <form id="fPw"><label>Password lama</label><input type="password" name="lama" required autocomplete="current-password">
+  <label>Password baru (min. 6 karakter)</label><input type="password" name="baru" required minlength="6" autocomplete="new-password">
+  <label>Ulangi password baru</label><input type="password" name="baru2" required minlength="6" autocomplete="new-password">
+  <div class="row end" style="margin-top:16px"><button type="button" class="btn" data-act="close">Batal</button><button class="btn primary">Simpan</button></div></form>`);
+  $('#fPw').onsubmit = async e => {
+    e.preventDefault();
+    const f = Object.fromEntries(new FormData(e.target));
+    if (f.baru !== f.baru2) { toast('Ulangi password tidak sama', 'err'); return; }
+    await safe(async () => { await api('changePassword', { lama:f.lama, baru:f.baru }); closeModal(); toast('Password diperbarui', 'ok'); });
+  };
+}
+
+/* ================= GURU ================= */
+function kelasList(){ return (S.boot.sekolah.daftar_kelas || '').split(',').map(s => s.trim()).filter(Boolean); }
+function kelasOptionsFor(g){
+  const all = kelasList();
+  if (g.tugas === 'Guru Kelas') return g.kelas ? [g.kelas] : all;
+  if (FASE_RANGE[g.tugas]) {
+    const [a, b] = FASE_RANGE[g.tugas];
+    const f = all.filter(k => { const n = leadNum(k); return n >= a && n <= b; });
+    return f.length ? f : all;
+  }
+  return all;
+}
+function statusBadge(st){
+  const c = st === 'Terverifikasi' ? 's-ok' : st === 'Revisi' ? 's-rev' : 's-wait';
+  return `<span class="badge ${c}">${esc(st)}</span>`;
+}
+
+function renderGuru(){
+  const v = $('#viewGuru');
+  v.innerHTML = `<div class="tabs"><button data-gtab="form" class="${gTab==='form'?'active':''}">📝 Isi Jurnal</button><button data-gtab="riwayat" class="${gTab==='riwayat'?'active':''}">📚 Riwayat Jurnal</button></div><div id="gBody"></div>`;
+  renderGuruBody();
+}
+function renderGuruBody(){
+  $('#viewGuru').querySelectorAll('[data-gtab]').forEach(b => b.classList.toggle('active', b.dataset.gtab === gTab));
+  if (gTab === 'form') guruForm(); else guruRiwayat();
+}
+
+function guruForm(j){
+  const b = S.boot, s = b.sekolah, me = b.me;
+  const opts = kelasOptionsFor(me);
+  j = j || { tanggal: todayISO(), jam_mulai:'', jam_selesai:'', kelas: opts.length === 1 ? opts[0] : '', mapel:'', materi:'', tujuan:'', kendala:'', tindak_lanjut:'', refleksi:'' };
+  S.editId = j.id || null;
+  const editing = !!j.id;
+  $('#gBody').innerHTML = `
+  <div class="card">
+    <h2>${editing ? '✏️ Ubah Jurnal' : '📝 Jurnal Harian Baru'}</h2>
+    ${editing && j.status === 'Revisi' ? `<div class="note rev"><b>Perlu revisi dari Kepala Sekolah:</b> ${esc(j.verif_catatan || '(tanpa catatan)')}</div>` : ''}
+    <div class="idgrid">
+      <div><label>Nama Kepala Sekolah</label><div class="ro">${esc(s.kepsek_nama) || '-'}</div></div>
+      <div><label>NIP Kepala Sekolah</label><div class="ro">${esc(s.kepsek_nip) || '-'}</div></div>
+      <div><label>Nama Guru</label><div class="ro">${esc(me.nama)}</div></div>
+      <div><label>NIP Guru</label><div class="ro">${esc(me.nip) || '-'}</div></div>
+      <div><label>Tahun Ajaran</label><div class="ro">${esc(s.tahun_ajaran)}</div></div>
+      <div><label>Semester</label><div class="ro">${esc(s.semester)}</div></div>
+    </div>
+    <form id="fJurnal">
+      <div class="grid3">
+        <div><label>Hari &amp; Tanggal</label><input type="date" id="fTgl" value="${esc(j.tanggal)}" required><div class="muted" id="fHari" style="margin-top:4px">${hariOf(j.tanggal)}</div></div>
+        <div><label>Jam Mulai</label><input type="time" id="fMulai" value="${esc(j.jam_mulai)}" required></div>
+        <div><label>Jam Selesai</label><input type="time" id="fSelesai" value="${esc(j.jam_selesai)}" required></div>
+      </div>
+      <div class="grid2">
+        <div><label>Kelas</label><select id="fKelas" required>${opts.length === 1 ? '' : '<option value="">-- Pilih kelas --</option>'}${opts.map(k => `<option ${k===j.kelas?'selected':''}>${esc(k)}</option>`).join('')}</select></div>
+        <div><label>Mata Pelajaran</label><select id="fMapel" required><option value="">-- Pilih mata pelajaran --</option>${b.mapel.map(m => `<option ${m.nama===j.mapel?'selected':''}>${esc(m.nama)}</option>`).join('')}</select></div>
+      </div>
+      <label>Materi Pembelajaran</label><textarea id="fMateri" required placeholder="Contoh: Pecahan senilai">${esc(j.materi)}</textarea>
+      <label>Tujuan Pembelajaran</label>
+      <textarea id="fTujuan" style="min-height:120px" placeholder="Klik tombol Generate setelah mengisi mata pelajaran dan materi">${esc(j.tujuan)}</textarea>
+      <div class="row" style="margin-top:6px"><button type="button" class="btn sm" data-act="gen">✨ Generate Tujuan Pembelajaran</button><span class="muted">Berupa draf, silakan edit sesuai CP/ATP Anda.</span></div>
+      <label>Kendala</label><textarea id="fKendala">${esc(j.kendala)}</textarea>
+      <label>Tindak Lanjut</label><textarea id="fTindak">${esc(j.tindak_lanjut)}</textarea>
+      <label>Refleksi Guru</label><textarea id="fRefleksi">${esc(j.refleksi)}</textarea>
+      <label>Paraf Guru</label><div class="paraf">Dikosongkan, diparaf setelah dicetak</div>
+      <div class="row end" style="margin-top:18px">
+        ${editing ? '<button type="button" class="btn" data-act="gcancel">Batal ubah</button>' : '<button type="button" class="btn" data-act="greset">Kosongkan</button>'}
+        <button class="btn primary" type="submit">${editing ? 'Simpan Perubahan' : 'Simpan Jurnal'}</button>
+      </div>
+    </form>
+  </div>`;
+  $('#fTgl').onchange = e => { $('#fHari').textContent = hariOf(e.target.value); };
+  $('#fJurnal').onsubmit = async e => { e.preventDefault(); await saveJurnal(); };
+}
+
+async function saveJurnal(){
+  const d = { id:S.editId || '', tanggal:$('#fTgl').value, jam_mulai:$('#fMulai').value, jam_selesai:$('#fSelesai').value,
+    kelas:$('#fKelas').value, mapel:$('#fMapel').value, materi:$('#fMateri').value.trim(), tujuan:$('#fTujuan').value.trim(),
+    kendala:$('#fKendala').value.trim(), tindak_lanjut:$('#fTindak').value.trim(), refleksi:$('#fRefleksi').value.trim() };
+  if (d.jam_selesai <= d.jam_mulai) { toast('Jam selesai harus setelah jam mulai', 'err'); return; }
+  await safe(async () => {
+    await api('saveJurnal', { jurnal:d });
+    toast('Jurnal tersimpan dan menunggu verifikasi kepala sekolah', 'ok');
+    gTab = 'riwayat'; S.editId = null; renderGuru();
+  });
+}
+
+function faseOf(kelas){
+  const n = leadNum(kelas); if (n == null) return '';
+  if (n <= 2) return 'A'; if (n <= 4) return 'B'; if (n <= 6) return 'C'; if (n <= 9) return 'D'; if (n === 10) return 'E'; return 'F';
+}
+const VERBS = [
+  [/matematika/, ['memahami konsep','menyelesaikan masalah yang berkaitan dengan','menerapkan']],
+  [/bahasa|literasi/, ['menyimak dan memahami','menyampaikan secara lisan dan tulisan','menyusun teks berdasarkan']],
+  [/pjok|jasmani|olahraga/, ['mengenal gerakan dasar','mempraktikkan','mengevaluasi hasil gerak pada']],
+  [/seni|prakarya/, ['mengamati','mengeksplorasi','mengekspresikan gagasan melalui karya tentang']],
+  [/agama|budi pekerti|pancasila|ppkn|pkn/, ['memahami nilai-nilai dalam','menjelaskan','meneladani dan menerapkan']],
+  [/ipa|ipas|ips|sains|biologi|fisika|kimia|geografi|sejarah|ekonomi|sosiologi/, ['mengidentifikasi','menjelaskan','menganalisis dan mengaitkan dengan kehidupan sehari-hari']]
+];
+function genTujuan(){
+  const mapel = $('#fMapel').value, kelas = $('#fKelas').value, materi = $('#fMateri').value.trim();
+  if (!mapel || !materi) { toast('Isi mata pelajaran dan materi terlebih dahulu', 'err'); return; }
+  const mp = mapel.toLowerCase(), m = materi.toLowerCase(), fase = faseOf(kelas);
+  const hit = (S.boot.bank || []).filter(b => {
+    const ks = String(b.kelas || '').split(',').map(x => x.trim()).filter(Boolean);
+    return (!b.mapel || b.mapel.toLowerCase() === mp) && (!ks.length || ks.includes(kelas) || ks.includes(fase))
+      && (!b.kata_kunci || m.includes(b.kata_kunci.toLowerCase()));
+  });
+  let text;
+  if (hit.length) {
+    text = hit.map((h, i) => hit.length > 1 ? `${i+1}. ${h.tujuan}` : h.tujuan).join('\n');
+    toast('Tujuan diambil dari Bank TP sekolah. Silakan periksa.', 'ok');
+  } else {
+    const v = (VERBS.find(x => x[0].test(mp)) || [0, ['mengidentifikasi','menjelaskan','menerapkan']])[1];
+    text = `Melalui kegiatan pembelajaran${fase ? ` (Fase ${fase})` : ''}, peserta didik mampu:\n` +
+      `1. ${v[0]} ${materi} dengan tepat.\n` +
+      `2. ${v[1]} ${materi} menggunakan bahasanya sendiri.\n` +
+      `3. ${v[2]} ${materi} dalam kehidupan sehari-hari secara mandiri dan bernalar kritis.`;
+    toast('Draf tujuan dibuat. Silakan periksa dan sesuaikan.', 'ok');
+  }
+  $('#fTujuan').value = text;
+}
+
+async function guruRiwayat(){
+  $('#gBody').innerHTML = `<div class="card"><h2>📚 Riwayat Jurnal Saya</h2>
+    <div class="filters">
+      <div><label>Bulan</label><input type="month" id="rBulan"></div>
+      <div><label>Status</label><select id="rStatus"><option value="">Semua</option><option>Menunggu</option><option>Terverifikasi</option><option>Revisi</option></select></div>
+      <div><label>Cari</label><input id="rCari" placeholder="Materi / mapel / kelas"></div>
+    </div><div id="rTable"></div></div>`;
+  ['#rBulan','#rStatus','#rCari'].forEach(id => $(id).oninput = drawRiwayat);
+  await safe(async () => { const r = await api('listJurnal', { filter:{} }); S.jurnal = r.jurnal; drawRiwayat(); });
+}
+function drawRiwayat(){
+  const bln = $('#rBulan').value, st = $('#rStatus').value, q = $('#rCari').value.toLowerCase();
+  const list = S.jurnal.filter(j => (!bln || j.tanggal.startsWith(bln)) && (!st || j.status === st) &&
+    (!q || (j.materi + ' ' + j.mapel + ' ' + j.kelas).toLowerCase().includes(q)));
+  $('#rTable').innerHTML = list.length ? `<div class="tablewrap"><table><thead><tr><th>Tanggal</th><th>Jam</th><th>Kelas</th><th>Mapel</th><th>Materi</th><th>Status</th><th></th></tr></thead><tbody>${
+    list.map(j => `<tr><td>${esc(j.hari)}, ${tglIndo(j.tanggal)}</td><td>${esc(j.jam_mulai)}-${esc(j.jam_selesai)}</td><td>${esc(j.kelas)}</td><td>${esc(j.mapel)}</td><td>${esc(j.materi)}</td><td>${statusBadge(j.status)}</td>
+    <td class="act"><button class="btn sm" data-act="gview" data-id="${j.id}">Lihat</button><button class="btn sm" data-act="gprint" data-id="${j.id}">Cetak</button>${j.status !== 'Terverifikasi' ? `<button class="btn sm" data-act="gedit" data-id="${j.id}">Ubah</button><button class="btn sm danger" data-act="gdel" data-id="${j.id}">Hapus</button>` : ''}</td></tr>`).join('')
+  }</tbody></table></div>` : '<div class="empty">Belum ada jurnal yang sesuai.</div>';
+}
+
+function detailHTML(j){
+  const rows = [['Hari / Tanggal', `${j.hari}, ${tglIndo(j.tanggal)}`], ['Jam Pelajaran', `${j.jam_mulai} - ${j.jam_selesai}`],
+    ['Guru', `${j.guru_nama}${j.guru_nip ? ' (NIP ' + j.guru_nip + ')' : ''}`], ['Kepala Sekolah', `${j.kepsek_nama || '-'}${j.kepsek_nip ? ' (NIP ' + j.kepsek_nip + ')' : ''}`],
+    ['Tahun Ajaran / Semester', `${j.tahun_ajaran} / ${j.semester}`], ['Kelas', j.kelas], ['Mata Pelajaran', j.mapel],
+    ['Materi Pembelajaran', j.materi], ['Tujuan Pembelajaran', j.tujuan || '-'], ['Kendala', j.kendala || '-'],
+    ['Tindak Lanjut', j.tindak_lanjut || '-'], ['Refleksi Guru', j.refleksi || '-']];
+  return `<dl class="dl">${rows.map(([k, v]) => `<dt>${k}</dt><dd>${esc(v)}</dd>`).join('')}
+    <dt>Status</dt><dd>${statusBadge(j.status)}${j.verif_tgl ? ' <span class="muted">' + esc(j.verif_tgl) + '</span>' : ''}</dd>
+    ${j.verif_catatan ? `<dt>Catatan Kepala Sekolah</dt><dd>${esc(j.verif_catatan)}</dd>` : ''}</dl>`;
+}
+
+/* ---------- cetak ---------- */
+function printHTML(j){
+  const s = S.boot.sekolah;
+  const nl = t => esc(t || '-').replace(/\n/g, '<br>');
+  return `<div class="pp">
+    <div class="kop">${s.logo ? `<img src="${esc(s.logo)}" alt="">` : ''}<div><div class="k1">${esc(s.nama_sekolah)}</div><div class="k2">${esc(s.alamat)}</div><div class="k2">NPSN: ${esc(s.npsn) || '-'}</div></div></div>
+    <h2>JURNAL MENGAJAR HARIAN</h2>
+    <table class="pt">
+      <tr><td>Hari / Tanggal</td><td>${esc(j.hari)}, ${tglIndo(j.tanggal)}</td></tr>
+      <tr><td>Tahun Ajaran / Semester</td><td>${esc(j.tahun_ajaran)} / ${esc(j.semester)}</td></tr>
+      <tr><td>Nama Guru</td><td>${esc(j.guru_nama)}${j.guru_nip ? '<br>NIP. ' + esc(j.guru_nip) : ''}</td></tr>
+      <tr><td>Jam Pelajaran</td><td>${esc(j.jam_mulai)} - ${esc(j.jam_selesai)}</td></tr>
+      <tr><td>Kelas</td><td>${esc(j.kelas)}</td></tr>
+      <tr><td>Mata Pelajaran</td><td>${esc(j.mapel)}</td></tr>
+      <tr><td>Materi Pembelajaran</td><td>${nl(j.materi)}</td></tr>
+      <tr><td>Tujuan Pembelajaran</td><td>${nl(j.tujuan)}</td></tr>
+      <tr><td>Kendala</td><td>${nl(j.kendala)}</td></tr>
+      <tr><td>Tindak Lanjut</td><td>${nl(j.tindak_lanjut)}</td></tr>
+      <tr><td>Refleksi Guru</td><td>${nl(j.refleksi)}</td></tr>
+      <tr><td>Paraf Guru</td><td style="height:60px"></td></tr>
+    </table>
+    <div class="sign">
+      <div>Mengetahui,<br>Kepala Sekolah<div class="sp">${j.status === 'Terverifikasi' ? '<br><small>(Terverifikasi ' + esc(j.verif_tgl) + ')</small>' : ''}</div><b><u>${esc(j.kepsek_nama || '..............................')}</u></b><br>${j.kepsek_nip ? 'NIP. ' + esc(j.kepsek_nip) : ''}</div>
+      <div><br>Guru<div class="sp"></div><b><u>${esc(j.guru_nama)}</u></b><br>${j.guru_nip ? 'NIP. ' + esc(j.guru_nip) : ''}</div>
+    </div></div>`;
+}
+function doPrint(list){
+  if (!list.length) { toast('Tidak ada jurnal untuk dicetak', 'err'); return; }
+  $('#printArea').innerHTML = list.map(printHTML).join('');
+  setTimeout(() => window.print(), 150);
+}
+
+/* ================= ADMIN ================= */
+function renderAdmin(){
+  $('#viewAdmin').innerHTML = `<div class="tabs">${[['sekolah','🏫 Data Sekolah'],['guru','👩‍🏫 Data Guru'],['mapel','📖 Mata Pelajaran'],['akun','🔑 Akun Login']]
+    .map(([k, l]) => `<button data-atab="${k}" class="${k === adminTab ? 'active' : ''}">${l}</button>`).join('')}</div><div id="aBody"></div>`;
+  renderAdminBody();
+}
+async function renderAdminBody(){
+  $('#viewAdmin').querySelectorAll('[data-atab]').forEach(b => b.classList.toggle('active', b.dataset.atab === adminTab));
+  const b = $('#aBody');
+  if (adminTab === 'sekolah') { b.innerHTML = sekolahForm(); bindSekolah(); }
+  else if (adminTab === 'guru') { b.innerHTML = '<div class="card"><div class="row" style="justify-content:space-between;margin-bottom:12px"><h2 style="margin:0">Data Guru</h2><div class="row"><input id="gCari" placeholder="Cari nama / NIP" style="width:210px"><button class="btn primary" data-act="guru-add">+ Tambah Guru</button></div></div><div id="gTable"></div></div>'; $('#gCari').oninput = drawGuruTable; await safe(loadGuruList); }
+  else if (adminTab === 'mapel') { b.innerHTML = mapelShell(); drawMapel(); }
+  else { b.innerHTML = akunForm(); bindAkun(); }
+}
+
+function sekolahForm(){
+  const s = S.boot.sekolah; S.logoTmp = null;
+  const sel = (v, arr) => arr.map(([val, lab]) => `<option value="${val}" ${val === v ? 'selected' : ''}>${lab}</option>`).join('');
+  return `<div class="card"><h2>Data Sekolah</h2><form id="fSekolah" class="grid2">
+    <div><label>Nama Sekolah</label><input name="nama_sekolah" value="${esc(s.nama_sekolah)}" required></div>
+    <div><label>NPSN</label><input name="npsn" value="${esc(s.npsn)}" inputmode="numeric"></div>
+    <div class="span2"><label>Alamat</label><textarea name="alamat" style="min-height:64px">${esc(s.alamat)}</textarea></div>
+    <div><label>Jenjang</label><select name="jenjang">${sel(s.jenjang, [['SD','SD / MI'],['SMP','SMP / MTs'],['SMA','SMA / SMK / MA']])}</select></div>
+    <div><label>Tahun Ajaran</label><input name="tahun_ajaran" value="${esc(s.tahun_ajaran)}" placeholder="2026/2027" required></div>
+    <div><label>Semester</label><select name="semester">${sel(s.semester, [['Ganjil','Ganjil'],['Genap','Genap']])}</select></div>
+    <div><label>Daftar Kelas (pisahkan koma)</label><input name="daftar_kelas" id="inKelas" value="${esc(s.daftar_kelas)}" placeholder="1,2,3 atau 7A,7B,8A">
+      <button type="button" class="btn sm" data-act="kelas-auto" style="margin-top:6px">Isi otomatis sesuai jenjang</button></div>
+    <div><label>Nama Kepala Sekolah</label><input name="kepsek_nama" value="${esc(s.kepsek_nama)}"></div>
+    <div><label>NIP Kepala Sekolah</label><input name="kepsek_nip" value="${esc(s.kepsek_nip)}" inputmode="numeric"></div>
+    <div class="span2"><label>Logo Sekolah</label><div class="logo-row"><img id="logoPrev" src="${esc(s.logo)}" ${s.logo ? '' : 'hidden'} alt="">
+      <input type="file" id="logoFile" accept="image/*" style="width:auto"><button type="button" class="btn sm danger" data-act="logo-del">Hapus logo</button></div></div>
+    <div class="span2 row end" style="margin-top:14px"><button class="btn primary">Simpan Data Sekolah</button></div></form></div>`;
+}
+function bindSekolah(){
+  $('#logoFile').onchange = async e => {
+    const f = e.target.files[0]; if (!f) return;
+    try { S.logoTmp = await shrinkImage(f); $('#logoPrev').src = S.logoTmp; $('#logoPrev').hidden = false; }
+    catch (err) { toast('Gagal memproses gambar', 'err'); }
+  };
+  $('#fSekolah').onsubmit = async e => {
+    e.preventDefault();
+    const d = Object.fromEntries(new FormData(e.target)); delete d.logo;
+    if (!/^\d{4}\/\d{4}$/.test(d.tahun_ajaran)) { toast('Format tahun ajaran: 2026/2027', 'err'); return; }
+    d.logo = S.logoTmp !== null ? S.logoTmp : S.boot.sekolah.logo;
+    await safe(async () => { await api('saveSekolah', { sekolah:d }); const r = await api('boot'); S.boot = r; applyBrand(); toast('Data sekolah tersimpan', 'ok'); });
+  };
+}
+function shrinkImage(file){
+  return new Promise((res, rej) => {
+    const fr = new FileReader();
+    fr.onerror = rej;
+    fr.onload = () => {
+      const img = new Image(); img.onerror = rej;
+      img.onload = () => {
+        let size = 180;
+        for (let i = 0; i < 8; i++) {
+          const r = Math.min(size / img.width, size / img.height, 1);
+          const c = document.createElement('canvas'); c.width = Math.max(1, Math.round(img.width * r)); c.height = Math.max(1, Math.round(img.height * r));
+          c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+          let out = c.toDataURL('image/png');
+          if (out.length > 45000) out = c.toDataURL('image/jpeg', 0.82);
+          if (out.length <= 45000) return res(out);
+          size = Math.round(size * 0.8);
+        }
+        rej(new Error('too big'));
+      };
+      img.src = fr.result;
+    };
+    fr.readAsDataURL(file);
+  });
+}
+
+/* --- guru (admin) --- */
+async function loadGuruList(){ const r = await api('listGuru'); S.guru = r.guru; drawGuruTable(); }
+function drawGuruTable(){
+  const q = ($('#gCari') ? $('#gCari').value : '').toLowerCase();
+  const list = S.guru.filter(g => !q || (g.nama + ' ' + g.nip).toLowerCase().includes(q));
+  $('#gTable').innerHTML = list.length ? `<div class="tablewrap"><table><thead><tr><th>No</th><th>Nama</th><th>NIP</th><th>Tugas Mengajar</th><th>Username</th><th>Status</th><th></th></tr></thead><tbody>${
+    list.map((g, i) => `<tr><td>${i+1}</td><td>${esc(g.nama)}</td><td>${esc(g.nip) || '-'}</td><td>${esc(g.tugas)}${g.kelas ? ' (Kelas ' + esc(g.kelas) + ')' : ''}</td><td>${esc(g.username)}</td>
+    <td>${g.aktif === '0' ? '<span class="badge s-rev">Nonaktif</span>' : '<span class="badge s-ok">Aktif</span>'}</td>
+    <td class="act"><button class="btn sm" data-act="guru-edit" data-id="${g.id}">Edit</button><button class="btn sm danger" data-act="guru-del" data-id="${g.id}">Hapus</button></td></tr>`).join('')
+  }</tbody></table></div>` : '<div class="empty">Belum ada data guru.</div>';
+}
+function guruModal(g){
+  const isNew = !g;
+  g = g || { id:'', nama:'', nip:'', tugas:'Guru Mapel', kelas:'', username:'', aktif:'1' };
+  openModal(`<h3>${isNew ? 'Tambah' : 'Edit'} Guru</h3><form id="fGuru" class="grid2">
+    <div class="span2"><label>Nama Lengkap (beserta gelar)</label><input name="nama" value="${esc(g.nama)}" required></div>
+    <div><label>NIP</label><input name="nip" value="${esc(g.nip)}" inputmode="numeric"></div>
+    <div><label>Tugas Mengajar</label><select name="tugas" id="gTugas">${TUGAS.map(t => `<option ${t === g.tugas ? 'selected' : ''}>${t}</option>`).join('')}</select></div>
+    <div class="span2" id="gKelasBox"><label>Kelas yang diampu</label><select name="kelas">${kelasList().map(k => `<option ${k === g.kelas ? 'selected' : ''}>${esc(k)}</option>`).join('')}</select></div>
+    <div><label>Username</label><input name="username" id="gUser" value="${esc(g.username)}" required autocomplete="off"></div>
+    <div><label>${isNew ? 'Password awal' : 'Password baru (kosongkan jika tidak diubah)'}</label><input name="password" value="${isNew ? 'guru123' : ''}" ${isNew ? 'required' : ''} minlength="6" autocomplete="new-password"></div>
+    <div class="span2"><label style="display:flex;gap:8px;align-items:center"><input type="checkbox" name="aktif" ${g.aktif === '0' ? '' : 'checked'}> Akun aktif</label></div>
+    <div class="span2 row end" style="margin-top:12px"><button type="button" class="btn" data-act="close">Batal</button><button class="btn primary">Simpan</button></div></form>`);
+  const toggle = () => { $('#gKelasBox').hidden = $('#gTugas').value !== 'Guru Kelas'; };
+  $('#gTugas').onchange = toggle; toggle();
+  if (isNew) { const nipEl = $('#fGuru [name=nip]'); nipEl.oninput = () => { if (!$('#gUser').dataset.t) $('#gUser').value = nipEl.value; }; $('#gUser').oninput = () => { $('#gUser').dataset.t = 1; }; }
+  $('#fGuru').onsubmit = async e => {
+    e.preventDefault();
+    const f = Object.fromEntries(new FormData(e.target));
+    f.aktif = e.target.aktif.checked ? '1' : '0'; f.id = g.id;
+    if (f.tugas !== 'Guru Kelas') f.kelas = '';
+    await safe(async () => { await api('saveGuru', { guru:f }); closeModal(); toast('Data guru tersimpan', 'ok'); await loadGuruList(); });
+  };
+}
+
+/* --- mapel --- */
+function mapelShell(){
+  return `<div class="card"><h2>Mata Pelajaran</h2><form id="fMapelAdd" class="row" style="margin-bottom:14px"><input id="mNama" placeholder="Nama mata pelajaran baru" style="flex:1;min-width:200px" required><button class="btn primary">+ Tambah</button></form><div id="mList"></div></div>`;
+}
+function drawMapel(){
+  const m = S.boot.mapel;
+  $('#mList').innerHTML = m.length ? `<div class="tablewrap"><table><thead><tr><th>No</th><th>Mata Pelajaran</th><th></th></tr></thead><tbody>${
+    m.map((x, i) => `<tr><td>${i+1}</td><td>${esc(x.nama)}</td><td class="act"><button class="btn sm" data-act="mapel-edit" data-id="${x.id}">Ubah</button><button class="btn sm danger" data-act="mapel-del" data-id="${x.id}">Hapus</button></td></tr>`).join('')
+  }</tbody></table></div>` : '<div class="empty">Belum ada mata pelajaran.</div>';
+  $('#fMapelAdd').onsubmit = async e => {
+    e.preventDefault();
+    await safe(async () => { const r = await api('saveMapel', { mapel:{ nama:$('#mNama').value } }); S.boot.mapel = r.mapel; $('#mNama').value = ''; drawMapel(); toast('Mata pelajaran ditambahkan', 'ok'); });
+  };
+}
+
+/* --- akun --- */
+function akunForm(){
+  const a = S.boot.akun || {};
+  return `<div class="card"><h2>Akun Login Admin &amp; Kepala Sekolah</h2><form id="fAkun" class="grid2">
+    <div class="span2 note">Kosongkan kolom password jika tidak ingin mengubahnya. Password guru diatur pada menu Data Guru.</div>
+    <div><label>Username Admin</label><input name="admin_user" value="${esc(a.admin_user)}" required></div>
+    <div><label>Password Admin baru</label><input name="admin_pass" minlength="6" autocomplete="new-password"></div>
+    <div><label>Username Kepala Sekolah</label><input name="kepsek_user" value="${esc(a.kepsek_user)}" required></div>
+    <div><label>Password Kepala Sekolah baru</label><input name="kepsek_pass" minlength="6" autocomplete="new-password"></div>
+    <div class="span2 row end" style="margin-top:14px"><button class="btn primary">Simpan Akun</button></div></form></div>`;
+}
+function bindAkun(){
+  $('#fAkun').onsubmit = async e => {
+    e.preventDefault();
+    const f = Object.fromEntries(new FormData(e.target));
+    await safe(async () => { await api('saveAkun', { akun:f }); S.boot.akun = { admin_user:f.admin_user, kepsek_user:f.kepsek_user }; e.target.admin_pass.value = ''; e.target.kepsek_pass.value = ''; toast('Akun tersimpan', 'ok'); });
+  };
+}
+
+/* ================= KEPALA SEKOLAH ================= */
+function renderKepsek(){
+  const kl = kelasList();
+  $('#viewKepsek').innerHTML = `<div class="card"><h2>📋 Pemantauan Jurnal Mengajar</h2>
+    <div class="filters">
+      <div><label>Kelas</label><select id="kKelas"><option value="">Semua kelas</option>${kl.map(k => `<option>${esc(k)}</option>`).join('')}</select></div>
+      <div><label>Status</label><select id="kStatus"><option value="">Semua</option><option>Menunggu</option><option>Terverifikasi</option><option>Revisi</option></select></div>
+      <div><label>Guru</label><select id="kGuru"><option value="">Semua guru</option></select></div>
+      <div><label>Dari tanggal</label><input type="date" id="kDari" value="${monthStartISO()}"></div>
+      <div><label>Sampai tanggal</label><input type="date" id="kSampai" value="${todayISO()}"></div>
+      <div><label>Cari</label><input id="kCari" placeholder="Guru / materi / mapel"></div>
+    </div>
+    <div class="row"><button class="btn primary" data-act="k-load">Tampilkan</button><button class="btn" data-act="k-reset">Reset filter</button></div>
+    <div class="stats" id="kStats"></div>
+    <div class="row" style="margin-bottom:10px"><button class="btn ok" data-act="k-bulk-ok">✔ Verifikasi terpilih</button><button class="btn" data-act="k-bulk-print">🖨 Cetak terpilih</button><span class="muted" id="kSel"></span></div>
+    <div id="kTable"></div></div>`;
+  ['#kKelas','#kStatus','#kGuru'].forEach(id => $(id).onchange = loadKepsek);
+  $('#kCari').oninput = drawKepsek;
+  safe(async () => {
+    const r = await api('listGuru');
+    $('#kGuru').innerHTML = '<option value="">Semua guru</option>' + r.guru.map(g => `<option value="${g.id}">${esc(g.nama)}</option>`).join('');
+    await loadKepsek();
+  });
+}
+async function loadKepsek(){
+  const f = { kelas:$('#kKelas').value, status:$('#kStatus').value, guru_id:$('#kGuru').value, dari:$('#kDari').value, sampai:$('#kSampai').value };
+  await safe(async () => { const r = await api('listJurnal', { filter:f }); S.jurnal = r.jurnal; drawKepsek(); });
+}
+function kFiltered(){
+  const q = $('#kCari').value.toLowerCase();
+  return S.jurnal.filter(j => !q || (j.guru_nama + ' ' + j.materi + ' ' + j.mapel).toLowerCase().includes(q));
+}
+function drawKepsek(){
+  const list = kFiltered();
+  const c = st => list.filter(j => j.status === st).length;
+  $('#kStats').innerHTML = `<div class="stat"><b>${list.length}</b>Total jurnal</div><div class="stat"><b>${c('Menunggu')}</b>Menunggu verifikasi</div><div class="stat"><b>${c('Terverifikasi')}</b>Terverifikasi</div><div class="stat"><b>${c('Revisi')}</b>Perlu revisi</div>`;
+  $('#kTable').innerHTML = list.length ? `<div class="tablewrap"><table><thead><tr><th><input type="checkbox" id="kAll"></th><th>Tanggal</th><th>Jam</th><th>Guru</th><th>Kelas</th><th>Mapel</th><th>Materi</th><th>Status</th><th></th></tr></thead><tbody>${
+    list.map(j => `<tr><td><input type="checkbox" class="kChk" value="${j.id}"></td><td>${esc(j.hari)}, ${tglIndo(j.tanggal)}</td><td>${esc(j.jam_mulai)}-${esc(j.jam_selesai)}</td><td>${esc(j.guru_nama)}</td><td>${esc(j.kelas)}</td><td>${esc(j.mapel)}</td><td>${esc(j.materi)}</td><td>${statusBadge(j.status)}</td>
+    <td class="act"><button class="btn sm primary" data-act="k-detail" data-id="${j.id}">Detail</button></td></tr>`).join('')
+  }</tbody></table></div>` : '<div class="empty">Tidak ada jurnal pada filter ini.</div>';
+  const all = $('#kAll');
+  if (all) all.onchange = () => { document.querySelectorAll('.kChk').forEach(x => x.checked = all.checked); updSel(); };
+  document.querySelectorAll('.kChk').forEach(x => x.onchange = updSel); updSel();
+}
+function selectedIds(){ return [...document.querySelectorAll('.kChk:checked')].map(x => x.value); }
+function updSel(){ const n = selectedIds().length; $('#kSel').textContent = n ? n + ' jurnal dipilih' : ''; }
+function kDetail(id){
+  const j = S.jurnal.find(x => x.id === id); if (!j) return;
+  openModal(`<h3>Detail Jurnal</h3>${detailHTML(j)}
+    <label>Catatan Kepala Sekolah (opsional)</label><textarea id="kCat">${esc(j.verif_catatan)}</textarea>
+    <div class="row end" style="margin-top:14px">
+      <button class="btn" data-act="close">Tutup</button><button class="btn" data-act="k-print1" data-id="${j.id}">🖨 Cetak</button>
+      ${j.status === 'Terverifikasi' ? `<button class="btn warn" data-act="k-set" data-st="Menunggu" data-id="${j.id}">Batalkan verifikasi</button>` : `<button class="btn danger" data-act="k-set" data-st="Revisi" data-id="${j.id}">Minta revisi</button><button class="btn ok" data-act="k-set" data-st="Terverifikasi" data-id="${j.id}">✔ Verifikasi</button>`}
+    </div>`, true);
+}
+async function kSet(ids, st, catatan){
+  if (st === 'Revisi' && !(catatan || '').trim()) { toast('Isi catatan agar guru tahu bagian yang perlu direvisi', 'err'); return; }
+  await safe(async () => {
+    const q = { ids, status:st }; if (catatan !== undefined) q.catatan = catatan;
+    await api('verif', q);
+    closeModal(); toast(st === 'Terverifikasi' ? 'Jurnal terverifikasi' : 'Status diperbarui', 'ok'); await loadKepsek();
+  });
+}
+
+/* ================= EVENT DELEGATION ================= */
+document.addEventListener('click', async e => {
+  const t = e.target.closest('[data-act],[data-gtab],[data-atab]'); if (!t) return;
+  if (t.dataset.gtab) { gTab = t.dataset.gtab; S.editId = null; renderGuruBody(); return; }
+  if (t.dataset.atab) { adminTab = t.dataset.atab; renderAdminBody(); return; }
+  const act = t.dataset.act, id = t.dataset.id;
+  switch (act) {
+    case 'close': closeModal(); break;
+    case 'logout': doLogout(); break;
+    case 'pw': pwModal(); break;
+    /* guru */
+    case 'gen': genTujuan(); break;
+    case 'greset': guruForm(); break;
+    case 'gcancel': gTab = 'riwayat'; renderGuru(); break;
+    case 'gview': { const j = S.jurnal.find(x => x.id === id); openModal(`<h3>Detail Jurnal</h3>${detailHTML(j)}<div class="row end" style="margin-top:14px"><button class="btn" data-act="close">Tutup</button><button class="btn primary" data-act="gprint" data-id="${id}">🖨 Cetak</button></div>`, true); break; }
+    case 'gprint': doPrint([S.jurnal.find(x => x.id === id)]); break;
+    case 'gedit': { const j = S.jurnal.find(x => x.id === id); gTab = 'form'; renderGuru(); guruForm(j); window.scrollTo(0, 0); break; }
+    case 'gdel': if (confirm('Hapus jurnal ini?')) await safe(async () => { await api('delJurnal', { id }); toast('Jurnal dihapus'); await guruRiwayat(); }); break;
+    /* admin */
+    case 'kelas-auto': { const jn = $('#fSekolah [name=jenjang]').value; $('#inKelas').value = KELAS_DEFAULT[jn] || ''; break; }
+    case 'logo-del': S.logoTmp = ''; $('#logoPrev').hidden = true; $('#logoFile').value = ''; break;
+    case 'guru-add': guruModal(); break;
+    case 'guru-edit': guruModal(S.guru.find(x => x.id === id)); break;
+    case 'guru-del': if (confirm('Hapus guru ini? Jurnal yang sudah dibuat tetap tersimpan.')) await safe(async () => { await api('delGuru', { id }); toast('Guru dihapus'); await loadGuruList(); }); break;
+    case 'mapel-edit': { const m = S.boot.mapel.find(x => x.id === id); const n = prompt('Ubah nama mata pelajaran:', m.nama); if (n && n.trim()) await safe(async () => { const r = await api('saveMapel', { mapel:{ id, nama:n } }); S.boot.mapel = r.mapel; drawMapel(); toast('Tersimpan', 'ok'); }); break; }
+    case 'mapel-del': { const m = S.boot.mapel.find(x => x.id === id); if (confirm(`Hapus mata pelajaran "${m.nama}"?`)) await safe(async () => { const r = await api('delMapel', { id }); S.boot.mapel = r.mapel; drawMapel(); toast('Dihapus'); }); break; }
+    /* kepsek */
+    case 'k-load': loadKepsek(); break;
+    case 'k-reset': $('#kKelas').value = ''; $('#kStatus').value = ''; $('#kGuru').value = ''; $('#kDari').value = ''; $('#kSampai').value = ''; $('#kCari').value = ''; loadKepsek(); break;
+    case 'k-detail': kDetail(id); break;
+    case 'k-set': kSet([id], t.dataset.st, $('#kCat').value); break;
+    case 'k-print1': doPrint([S.jurnal.find(x => x.id === id)]); break;
+    case 'k-bulk-ok': { const ids = selectedIds(); if (!ids.length) { toast('Pilih jurnal terlebih dahulu', 'err'); break; } if (confirm(`Verifikasi ${ids.length} jurnal terpilih?`)) kSet(ids, 'Terverifikasi'); break; }
+    case 'k-bulk-print': { const ids = selectedIds(); doPrint(S.jurnal.filter(j => ids.includes(j.id))); break; }
+  }
+});
+
+/* ================= INIT ================= */
+window.addEventListener('DOMContentLoaded', async () => {
+  bindLogin();
+  const raw = sessionStorage.getItem('jm_sess');
+  if (raw && apiUrl()) {
+    try { const o = JSON.parse(raw); S.token = o.token; S.user = o.user; await enter(); return; }
+    catch (e) { sessionStorage.removeItem('jm_sess'); S.token = null; S.user = null; }
+  }
+  showLogin();
+});
+</script>
+</body>
+</html>
