@@ -161,7 +161,7 @@ td.act{white-space:nowrap}td.act .btn{margin-right:4px}
    Tempel URL Web App (Apps Script) di bawah ini, atau biarkan kosong
    lalu isi lewat "Pengaturan koneksi" di halaman login.
    ============================================================ */
-const DEFAULT_API = 'https://script.google.com/macros/s/AKfycbzUEjA_vFjFaR3DqNHs0hYlf26DLaiDraydxaFYAeML7upeKP7ueYvEhChclghF7uXgLA/exec';
+const DEFAULT_API = 'https://script.google.com/macros/s/AKfycbwDM3hwqTV9IFceEyK_LXW3JEWoEN1AIctWwNmYI4UMbWyGiutyaigS9HxICUCCJgO-/exec';
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -180,7 +180,7 @@ const hariOf = s => s ? HARI[parseISO(s).getDay()] : '';
 const tglIndo = s => { if (!s) return ''; const d = parseISO(s); return `${d.getDate()} ${BULAN[d.getMonth()]} ${d.getFullYear()}`; };
 const leadNum = k => { const m = String(k).match(/\d+/); return m ? +m[0] : null; };
 
-const S = { token:null, user:null, boot:null, guru:[], jurnal:[], editId:null, loading:0, logoTmp:null };
+const S = { token:null, user:null, boot:null, guru:[], jurnal:[], editId:null, loading:0, logoTmp:null, hadir:null, hrekap:null };
 let loginRole = 'guru';
 let adminTab = 'sekolah';
 let gTab = 'form';
@@ -273,7 +273,7 @@ async function enter(){
   else { showView('kepsek'); renderKepsek(); }
 }
 function doLogout(silent){
-  S.token = null; S.user = null; S.boot = null; S.editId = null;
+  S.token = null; S.user = null; S.boot = null; S.editId = null; S.hadir = null; S.hrekap = null;
   sessionStorage.removeItem('jm_sess');
   closeModal();
   if (!silent) toast('Anda telah keluar');
@@ -314,7 +314,8 @@ function statusBadge(st){
 
 function renderGuru(){
   const v = $('#viewGuru');
-  v.innerHTML = `<div class="tabs"><button data-gtab="form" class="${gTab==='form'?'active':''}">📝 Isi Jurnal</button><button data-gtab="riwayat" class="${gTab==='riwayat'?'active':''}">📚 Riwayat Jurnal</button></div><div id="gBody"></div>`;
+  v.innerHTML = `<div id="hadirBox"></div><div class="tabs"><button data-gtab="form" class="${gTab==='form'?'active':''}">📝 Isi Jurnal</button><button data-gtab="riwayat" class="${gTab==='riwayat'?'active':''}">📚 Riwayat Jurnal</button></div><div id="gBody"></div>`;
+  initHadirBox();
   renderGuruBody();
 }
 function renderGuruBody(){
@@ -481,7 +482,7 @@ function doPrint(list){
 
 /* ================= ADMIN ================= */
 function renderAdmin(){
-  $('#viewAdmin').innerHTML = `<div class="tabs">${[['sekolah','🏫 Data Sekolah'],['guru','👩‍🏫 Data Guru'],['mapel','📖 Mata Pelajaran'],['akun','🔑 Akun Login']]
+  $('#viewAdmin').innerHTML = `<div class="tabs">${[['sekolah','🏫 Data Sekolah'],['guru','👩‍🏫 Data Guru'],['mapel','📖 Mata Pelajaran'],['hadir','🗓 Kehadiran'],['akun','🔑 Akun Login']]
     .map(([k, l]) => `<button data-atab="${k}" class="${k === adminTab ? 'active' : ''}">${l}</button>`).join('')}</div><div id="aBody"></div>`;
   renderAdminBody();
 }
@@ -491,6 +492,7 @@ async function renderAdminBody(){
   if (adminTab === 'sekolah') { b.innerHTML = sekolahForm(); bindSekolah(); }
   else if (adminTab === 'guru') { b.innerHTML = '<div class="card"><div class="row" style="justify-content:space-between;margin-bottom:12px"><h2 style="margin:0">Data Guru</h2><div class="row"><input id="gCari" placeholder="Cari nama / NIP" style="width:210px"><button class="btn primary" data-act="guru-add">+ Tambah Guru</button></div></div><div id="gTable"></div></div>'; $('#gCari').oninput = drawGuruTable; await safe(loadGuruList); }
   else if (adminTab === 'mapel') { b.innerHTML = mapelShell(); drawMapel(); }
+  else if (adminTab === 'hadir') { b.innerHTML = hadirAdminShell(); await loadHadirAdmin(); }
   else { b.innerHTML = akunForm(); bindAkun(); }
 }
 
@@ -623,7 +625,7 @@ function bindAkun(){
 /* ================= KEPALA SEKOLAH ================= */
 function renderKepsek(){
   const kl = kelasList();
-  $('#viewKepsek').innerHTML = `<div class="card"><h2>📋 Pemantauan Jurnal Mengajar</h2>
+  $('#viewKepsek').innerHTML = `<div id="hadirBox"></div><div class="card"><h2>📋 Pemantauan Jurnal Mengajar</h2>
     <div class="filters">
       <div><label>Kelas</label><select id="kKelas"><option value="">Semua kelas</option>${kl.map(k => `<option>${esc(k)}</option>`).join('')}</select></div>
       <div><label>Status</label><select id="kStatus"><option value="">Semua</option><option>Menunggu</option><option>Terverifikasi</option><option>Revisi</option></select></div>
@@ -636,6 +638,7 @@ function renderKepsek(){
     <div class="stats" id="kStats"></div>
     <div class="row" style="margin-bottom:10px"><button class="btn ok" data-act="k-bulk-ok">✔ Verifikasi terpilih</button><button class="btn" data-act="k-bulk-print">🖨 Cetak terpilih</button><span class="muted" id="kSel"></span></div>
     <div id="kTable"></div></div>`;
+  initHadirBox();
   ['#kKelas','#kStatus','#kGuru'].forEach(id => $(id).onchange = loadKepsek);
   $('#kCari').oninput = drawKepsek;
   safe(async () => {
@@ -684,6 +687,181 @@ async function kSet(ids, st, catatan){
   });
 }
 
+/* ================= KEHADIRAN ================= */
+const ALASAN = [['Sakit','Sakit'],['Ijin','Ijin'],['TKS','TKS (Tanpa Keterangan Sah)'],['Cuti','Cuti'],['Keperluan Lain','Keperluan Lain']];
+function hadirBadge(h){
+  if (!h) return '<span class="badge s-wait">Belum diisi</span>';
+  if (h.status === 'Hadir') return '<span class="badge s-ok">Hadir</span>';
+  return `<span class="badge s-rev">Tidak Hadir: ${esc(h.alasan)}</span>`;
+}
+const hadirKet = h => h.status === 'Hadir' ? '-' : h.alasan + (h.keterangan ? ' - ' + h.keterangan : '');
+
+function initHadirBox(){ if (S.hadir) drawHadirBox(); else loadHadirBox(); }
+async function loadHadirBox(){
+  await safe(async () => { S.hadir = await api('hadirSaya'); drawHadirBox(); });
+}
+function drawHadirBox(){
+  const box = $('#hadirBox'); if (!box || !S.hadir) return;
+  const r = S.hadir, h = r.hadir || { status:'', alasan:'', keterangan:'' };
+  box.innerHTML = `<div class="card">
+    <div class="row" style="justify-content:space-between;margin-bottom:4px"><h2 style="margin:0">🗓 Daftar Hadir</h2><div>${hadirBadge(r.hadir)}</div></div>
+    <div class="muted">${esc(r.hari)}, ${tglIndo(r.today)} • ${esc(S.user.nama)}</div>
+    <div class="grid3">
+      <div><label for="hStatus">Kehadiran</label><select id="hStatus"><option value="">-- Pilih --</option><option ${h.status==='Hadir'?'selected':''}>Hadir</option><option ${h.status==='Tidak Hadir'?'selected':''}>Tidak Hadir</option></select></div>
+      <div id="hAlasanBox"><label for="hAlasan">Alasan</label><select id="hAlasan"><option value="">-- Pilih alasan --</option>${ALASAN.map(([v, l]) => `<option value="${v}" ${v===h.alasan?'selected':''}>${l}</option>`).join('')}</select></div>
+      <div id="hKetBox"><label for="hKet">Keterangan</label><input id="hKet" maxlength="300" value="${esc(h.keterangan)}" placeholder="Tuliskan keperluannya"></div>
+    </div>
+    <div class="row end" style="margin-top:12px"><button class="btn primary" data-act="hadir-save">${r.hadir ? 'Perbarui Kehadiran' : 'Simpan Kehadiran'}</button></div>
+    ${r.riwayat && r.riwayat.length ? `<details><summary>Riwayat 7 hari terakhir</summary><div class="tablewrap" style="margin-top:8px"><table><thead><tr><th>Tanggal</th><th>Status</th><th>Keterangan</th></tr></thead><tbody>${
+      r.riwayat.map(x => `<tr><td>${esc(hariOf(x.tanggal))}, ${tglIndo(x.tanggal)}</td><td>${esc(x.status)}</td><td>${esc(hadirKet(x))}</td></tr>`).join('')}</tbody></table></div></details>` : ''}
+  </div>`;
+  const toggle = () => {
+    const st = $('#hStatus').value, al = $('#hAlasan').value;
+    $('#hAlasanBox').hidden = st !== 'Tidak Hadir';
+    $('#hKetBox').hidden = !(st === 'Tidak Hadir' && al === 'Keperluan Lain');
+  };
+  $('#hStatus').onchange = toggle; $('#hAlasan').onchange = toggle; toggle();
+}
+async function saveHadir(){
+  const d = { status:$('#hStatus').value, alasan:$('#hAlasan').value, keterangan:$('#hKet').value.trim() };
+  if (!d.status) { toast('Pilih Hadir atau Tidak Hadir', 'err'); return; }
+  if (d.status === 'Hadir') { d.alasan = ''; d.keterangan = ''; }
+  else {
+    if (!d.alasan) { toast('Pilih alasan tidak hadir', 'err'); return; }
+    if (d.alasan !== 'Keperluan Lain') d.keterangan = '';
+    else if (!d.keterangan) { toast('Isi keterangan untuk Keperluan Lain', 'err'); return; }
+  }
+  await safe(async () => { await api('saveHadir', { hadir:d }); toast('Kehadiran tersimpan', 'ok'); await loadHadirBox(); });
+}
+
+/* --- rekap di admin --- */
+function hadirAdminShell(){
+  return `<div class="card"><h2>🗓 Rekap Kehadiran Guru &amp; Kepala Sekolah</h2>
+    <div class="filters">
+      <div><label>Dari tanggal</label><input type="date" id="hDari" value="${monthStartISO()}"></div>
+      <div><label>Sampai tanggal</label><input type="date" id="hSampai" value="${todayISO()}"></div>
+      <div><label>Peran</label><select id="hPeran"><option value="">Semua</option><option>Guru</option><option>Kepala Sekolah</option></select></div>
+      <div><label>Status (daftar rinci)</label><select id="hSt"><option value="">Semua</option><option>Hadir</option><option>Tidak Hadir</option></select></div>
+    </div>
+    <div class="row"><button class="btn primary" data-act="h-load">Tampilkan</button><button class="btn" data-act="h-csv">⬇ Unduh CSV</button><button class="btn" data-act="h-pdf">📄 Unduh PDF</button></div>
+    <h3 style="margin-top:18px">Hari ini</h3>
+    <div class="stats" id="hStats"></div><div id="hBelum"></div>
+    <h3 style="margin-top:18px">Rekap per orang</h3><div id="hRekap"></div>
+    <h3 style="margin-top:18px">Daftar kehadiran</h3><div id="hDetail"></div></div>`;
+}
+async function loadHadirAdmin(){
+  const f = { dari:$('#hDari').value, sampai:$('#hSampai').value, peran:$('#hPeran').value, status:$('#hSt').value };
+  await safe(async () => { S.hrekap = await api('listHadir', { filter:f }); drawHadirAdmin(); });
+}
+function drawHadirAdmin(){
+  const r = S.hrekap; if (!r || !$('#hStats')) return;
+  $('#hStats').innerHTML = `<div class="stat"><b>${r.today.total}</b>Total</div><div class="stat"><b>${r.today.hadir}</b>Hadir</div><div class="stat"><b>${r.today.tidak}</b>Tidak hadir</div><div class="stat"><b>${r.belum.length}</b>Belum mengisi</div>`;
+  $('#hBelum').innerHTML = r.belum.length ? `<div class="note"><b>Belum mengisi hari ini:</b> ${r.belum.map(b => esc(b.nama)).join(', ')}</div>` : '';
+  $('#hRekap').innerHTML = r.rekap.length ? `<div class="tablewrap"><table><thead><tr><th>Nama</th><th>Peran</th><th>Hadir</th><th>Sakit</th><th>Ijin</th><th>TKS</th><th>Cuti</th><th>Lain</th><th>Total</th></tr></thead><tbody>${
+    r.rekap.map(x => `<tr><td>${esc(x.nama)}</td><td>${esc(x.peran)}</td><td>${x.hadir}</td><td>${x.sakit}</td><td>${x.ijin}</td><td>${x.tks}</td><td>${x.cuti}</td><td>${x.lain}</td><td><b>${x.total}</b></td></tr>`).join('')
+  }</tbody></table></div>` : '<div class="empty">Belum ada data.</div>';
+  $('#hDetail').innerHTML = r.list.length ? `<div class="tablewrap"><table><thead><tr><th>Tanggal</th><th>Nama</th><th>Peran</th><th>Status</th><th>Keterangan</th></tr></thead><tbody>${
+    r.list.map(h => `<tr><td>${esc(hariOf(h.tanggal))}, ${tglIndo(h.tanggal)}</td><td>${esc(h.nama)}</td><td>${esc(h.peran)}</td><td>${hadirBadge(h)}</td><td>${esc(hadirKet(h))}</td></tr>`).join('')
+  }</tbody></table></div>` : '<div class="empty">Tidak ada data pada filter ini.</div>';
+}
+function csvCell(v){ v = String(v == null ? '' : v); if (/^[=+\-@\t\r]/.test(v)) v = "'" + v; return '"' + v.replace(/"/g, '""') + '"'; }
+function hadirCsv(){
+  const r = S.hrekap;
+  if (!r || !r.list.length) { toast('Tidak ada data untuk diunduh', 'err'); return; }
+  const rows = [['Tanggal','Hari','Nama','NIP','Peran','Status','Alasan','Keterangan']]
+    .concat(r.list.map(h => [h.tanggal, hariOf(h.tanggal), h.nama, h.nip, h.peran, h.status, h.alasan, h.keterangan]));
+  const blob = new Blob(['﻿' + rows.map(x => x.map(csvCell).join(',')).join('\r\n')], { type:'text/csv;charset=utf-8' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `kehadiran_${$('#hDari').value || 'awal'}_${$('#hSampai').value || 'akhir'}.csv`;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+}
+
+/* --- unduh PDF (jsPDF dimuat saat dibutuhkan) --- */
+function loadScript(src){
+  return new Promise((res, rej) => {
+    const s = document.createElement('script'); s.src = src; s.onload = res;
+    s.onerror = () => rej(new Error('Gagal memuat pustaka PDF. Periksa koneksi internet lalu coba lagi.'));
+    document.head.appendChild(s);
+  });
+}
+async function ensurePdfLibs(){
+  if (!window.jspdf) await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+  if (!(window.jspdf && window.jspdf.jsPDF.API.autoTable)) await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js');
+}
+function imgSize(src){
+  return new Promise(res => { const i = new Image(); i.onload = () => res([i.naturalWidth, i.naturalHeight]); i.onerror = () => res(null); i.src = src; });
+}
+async function hadirPdf(){
+  const r = S.hrekap;
+  if (!r || (!r.rekap.length && !r.list.length)) { toast('Tidak ada data untuk diunduh', 'err'); return; }
+  const dari = $('#hDari').value, sampai = $('#hSampai').value, peran = $('#hPeran').value;
+  loading(true);
+  try {
+    await ensurePdfLibs();
+    const s = S.boot.sekolah;
+    const doc = new window.jspdf.jsPDF({ unit:'mm', format:'a4' });
+    const W = doc.internal.pageSize.getWidth(), H = doc.internal.pageSize.getHeight(), M = 14;
+    let tx = M;
+    if (s.logo) {
+      const sz = await imgSize(s.logo);
+      if (sz) {
+        const h = 20, w = Math.min(26, h * sz[0] / sz[1]);
+        try { doc.addImage(s.logo, /^data:image\/png/.test(s.logo) ? 'PNG' : 'JPEG', M, 12, w, h * Math.min(1, w / (h * sz[0] / sz[1]))); tx = M + w + 5; } catch (e) { /* logo dilewati */ }
+      }
+    }
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(14); doc.text(String(s.nama_sekolah || '').toUpperCase(), tx, 18);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
+    const alamat = doc.splitTextToSize(s.alamat || '', W - tx - M);
+    doc.text(alamat.slice(0, 2), tx, 23);
+    doc.text('NPSN: ' + (s.npsn || '-'), tx, 23 + Math.min(alamat.length, 2) * 4);
+    doc.setLineWidth(0.7); doc.line(M, 36, W - M, 36); doc.setLineWidth(0.2); doc.line(M, 37.2, W - M, 37.2);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(12);
+    doc.text('REKAP KEHADIRAN GURU DAN KEPALA SEKOLAH', W / 2, 45, { align:'center' });
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(10);
+    const periode = dari || sampai ? `${dari ? tglIndo(dari) : 'awal'} s.d. ${sampai ? tglIndo(sampai) : 'akhir'}` : 'Semua tanggal';
+    doc.text(`Periode: ${periode}${peran ? '  |  ' + peran : ''}`, W / 2, 51, { align:'center' });
+    doc.text(`Tahun Ajaran ${s.tahun_ajaran || '-'} Semester ${s.semester || '-'}`, W / 2, 56, { align:'center' });
+
+    const head = { fillColor:[15, 118, 110], textColor:255, fontSize:9 };
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(10.5); doc.text('A. Rekap per orang', M, 64);
+    doc.autoTable({
+      startY: 66, margin:{ left:M, right:M },
+      head: [['No', 'Nama', 'Peran', 'Hadir', 'Sakit', 'Ijin', 'TKS', 'Cuti', 'Lain', 'Total']],
+      body: r.rekap.map((x, i) => [i + 1, x.nama, x.peran, x.hadir, x.sakit, x.ijin, x.tks, x.cuti, x.lain, x.total]),
+      styles:{ fontSize:9, cellPadding:1.8 }, headStyles:head,
+      columnStyles:{ 0:{ halign:'center', cellWidth:10 }, 3:{ halign:'center' }, 4:{ halign:'center' }, 5:{ halign:'center' }, 6:{ halign:'center' }, 7:{ halign:'center' }, 8:{ halign:'center' }, 9:{ halign:'center', fontStyle:'bold' } }
+    });
+    let y = doc.lastAutoTable.finalY + 10;
+    if (y > H - 40) { doc.addPage(); y = 20; }
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(10.5); doc.text('B. Daftar kehadiran', M, y);
+    doc.autoTable({
+      startY: y + 2, margin:{ left:M, right:M },
+      head: [['No', 'Tanggal', 'Nama', 'Peran', 'Status', 'Keterangan']],
+      body: r.list.map((h, i) => [i + 1, `${hariOf(h.tanggal)}, ${tglIndo(h.tanggal)}`, h.nama, h.peran, h.status, hadirKet(h)]),
+      styles:{ fontSize:8.5, cellPadding:1.6 }, headStyles:head,
+      columnStyles:{ 0:{ halign:'center', cellWidth:10 } }
+    });
+    y = doc.lastAutoTable.finalY + 12;
+    if (y > H - 50) { doc.addPage(); y = 24; }
+    const sx = W - M - 62;
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(10);
+    doc.text('Mengetahui,', sx, y); doc.text('Kepala Sekolah', sx, y + 5);
+    const nm = s.kepsek_nama || '..............................';
+    doc.setFont('helvetica', 'bold'); doc.text(nm, sx, y + 28);
+    doc.setLineWidth(0.3); doc.line(sx, y + 29, sx + doc.getTextWidth(nm), y + 29);
+    doc.setFont('helvetica', 'normal'); if (s.kepsek_nip) doc.text('NIP. ' + s.kepsek_nip, sx, y + 34);
+
+    const n = doc.getNumberOfPages();
+    for (let p = 1; p <= n; p++) {
+      doc.setPage(p); doc.setFontSize(8); doc.setTextColor(110);
+      doc.text(`Dicetak ${tglIndo(todayISO())}`, M, H - 8);
+      doc.text(`Halaman ${p} dari ${n}`, W - M, H - 8, { align:'right' });
+    }
+    doc.save(`kehadiran_${dari || 'awal'}_${sampai || 'akhir'}.pdf`);
+    toast('PDF diunduh', 'ok');
+  } catch (e) { toast(e.message || 'Gagal membuat PDF', 'err'); }
+  finally { loading(false); }
+}
+
 /* ================= EVENT DELEGATION ================= */
 document.addEventListener('click', async e => {
   const t = e.target.closest('[data-act],[data-gtab],[data-atab]'); if (!t) return;
@@ -694,6 +872,11 @@ document.addEventListener('click', async e => {
     case 'close': closeModal(); break;
     case 'logout': doLogout(); break;
     case 'pw': pwModal(); break;
+    /* kehadiran */
+    case 'hadir-save': saveHadir(); break;
+    case 'h-load': loadHadirAdmin(); break;
+    case 'h-csv': hadirCsv(); break;
+    case 'h-pdf': hadirPdf(); break;
     /* guru */
     case 'gen': genTujuan(); break;
     case 'greset': guruForm(); break;
