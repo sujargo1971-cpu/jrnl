@@ -161,7 +161,7 @@ td.act{white-space:nowrap}td.act .btn{margin-right:4px}
    Tempel URL Web App (Apps Script) di bawah ini, atau biarkan kosong
    lalu isi lewat "Pengaturan koneksi" di halaman login.
    ============================================================ */
-const DEFAULT_API = 'https://script.google.com/macros/s/AKfycbwDM3hwqTV9IFceEyK_LXW3JEWoEN1AIctWwNmYI4UMbWyGiutyaigS9HxICUCCJgO-/exec';
+const DEFAULT_API = '';
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -297,15 +297,17 @@ function pwModal(){
 
 /* ================= GURU ================= */
 function kelasList(){ return (S.boot.sekolah.daftar_kelas || '').split(',').map(s => s.trim()).filter(Boolean); }
-function kelasOptionsFor(g){
+/* Semua guru boleh mengisi jurnal untuk kelas mana pun (mis. menggantikan guru yang tidak hadir). */
+function kelasOptionsFor(){ return kelasList(); }
+/* Kelas milik guru sendiri: dipakai sebagai pilihan awal dan penanda. */
+function kelasSaya(g){
   const all = kelasList();
-  if (g.tugas === 'Guru Kelas') return g.kelas ? [g.kelas] : all;
+  if (g.tugas === 'Guru Kelas') return g.kelas ? [g.kelas] : [];
   if (FASE_RANGE[g.tugas]) {
     const [a, b] = FASE_RANGE[g.tugas];
-    const f = all.filter(k => { const n = leadNum(k); return n >= a && n <= b; });
-    return f.length ? f : all;
+    return all.filter(k => { const n = leadNum(k); return n >= a && n <= b; });
   }
-  return all;
+  return [];
 }
 function statusBadge(st){
   const c = st === 'Terverifikasi' ? 's-ok' : st === 'Revisi' ? 's-rev' : 's-wait';
@@ -325,8 +327,9 @@ function renderGuruBody(){
 
 function guruForm(j){
   const b = S.boot, s = b.sekolah, me = b.me;
-  const opts = kelasOptionsFor(me);
-  j = j || { tanggal: todayISO(), jam_mulai:'', jam_selesai:'', kelas: opts.length === 1 ? opts[0] : '', mapel:'', materi:'', tujuan:'', kendala:'', tindak_lanjut:'', refleksi:'' };
+  const opts = kelasOptionsFor(me), mine = kelasSaya(me);
+  if (j && j.kelas && !opts.includes(j.kelas)) opts.push(j.kelas); // kelas lama yang sudah dihapus dari daftar tetap bisa diubah
+  j = j || { tanggal: todayISO(), jam_mulai:'', jam_selesai:'', kelas: mine.length === 1 ? mine[0] : '', mapel:'', materi:'', tujuan:'', kendala:'', tindak_lanjut:'', refleksi:'' };
   S.editId = j.id || null;
   const editing = !!j.id;
   $('#gBody').innerHTML = `
@@ -348,7 +351,8 @@ function guruForm(j){
         <div><label>Jam Selesai</label><input type="time" id="fSelesai" value="${esc(j.jam_selesai)}" required></div>
       </div>
       <div class="grid2">
-        <div><label>Kelas</label><select id="fKelas" required>${opts.length === 1 ? '' : '<option value="">-- Pilih kelas --</option>'}${opts.map(k => `<option ${k===j.kelas?'selected':''}>${esc(k)}</option>`).join('')}</select></div>
+        <div><label>Kelas</label><select id="fKelas" required><option value="">-- Pilih kelas --</option>${opts.map(k => `<option value="${esc(k)}" ${k===j.kelas?'selected':''}>${esc(k)}${mine.includes(k) ? ' (kelas saya)' : ''}</option>`).join('')}</select>
+          <div class="muted" style="margin-top:4px">Bisa memilih kelas mana pun, misalnya saat menggantikan guru yang berhalangan.</div></div>
         <div><label>Mata Pelajaran</label><select id="fMapel" required><option value="">-- Pilih mata pelajaran --</option>${b.mapel.map(m => `<option ${m.nama===j.mapel?'selected':''}>${esc(m.nama)}</option>`).join('')}</select></div>
       </div>
       <label>Materi Pembelajaran</label><textarea id="fMateri" required placeholder="Contoh: Pecahan senilai">${esc(j.materi)}</textarea>
